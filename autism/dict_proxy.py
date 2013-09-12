@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import json
+import collections
 
 __all__ = [
 	"FormatDictProxy",
@@ -8,46 +9,44 @@ __all__ = [
 	"PrefixDictProxy"
 ]
 
-class FormatDictProxy(object):
-	def __init__(self, backend, format=""):
-		self.backend = backend
+class FormatDictProxy(collections.UserDict):
+	def __init__(self, dict, format=""):
+		collections.UserDict.__init__(self, dict)
 		self.format = str(format)
-
-		for method in dir(backend):
-			if method not in self.__dict__:
-				self.__dict__[method] = getattr(backend, method)
 	
+	def __repr__(self):
+		return "FormatDictProxy({x!r})".format(self.data)
+
 	def __getitem__(self, key):
-		return self.backend[self.format.format(str(key))]
+		return self.data[self.format.format(str(key))]
 
 	def __setitem__(self, key, value):
-		self.backend[self.format.format(str(key))] = value
-	
+		self.data[self.format.format(str(key))] = value
+
 	def __delitem__(self, key):
-		del self.backend[self.format.format(str(key))]
-	
+		del self.data[self.format.format(str(key))]
+
 	def __contains__(self, key):
-		return self.format.format(str(key)) in self.backend
+		return self.format.format(str(key)) in self.data
 
-class SerializeDictProxy(object):
-	def __init__(self, backend, **kwargs):
-		self.encoder = json.dumps
-		self.decoder = json.loads
-		self.backend = backend
-		self.__dict__.update(kwargs)
-
-		for method in dir(backend):
-			if method not in self.__dict__:
-				self.__dict__[method] = getattr(backend, method)
+class SerializeDictProxy(collections.UserDict):
+	def __init__(self, dict, encoder=None, decoder=None):
+		collections.UserDict.__init__(self, dict)
+		if encoder is None:
+			encoder = json.dumps
+		if decoder is None:
+			decoder = json.loads
+		self.encoder = encoder
+		self.decoder = decoder
 
 	def __getitem__(self, key):
-		return self.decoder(self.backend[key])
+		return self.decoder(self.data[key])
 	
 	def __setitem__(self, key, value):
-		self.backend[key] = self.encoder(value)
+		self.data[key] = self.encoder(value)
 
 	def __contains__(self, key):
-		return key in self.backend
+		return key in self.data
 
 class PrefixDictProxy(FormatDictProxy):
 	def __init__(self, backend, prefix=""):
