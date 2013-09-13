@@ -1,7 +1,15 @@
 # coding: utf-8
 
+import autism.compat
+
 import json
-import collections
+
+if not autism.compat.py2k:
+	import collections
+	_UserDict = collections.UserDict
+else:
+	import UserDict
+	_UserDict = UserDict.UserDict
 
 __all__ = [
 	"FormatDictProxy",
@@ -9,9 +17,9 @@ __all__ = [
 	"PrefixDictProxy"
 ]
 
-class FormatDictProxy(collections.UserDict):
+class FormatDictProxy(_UserDict):
 	def __init__(self, dict, format=""):
-		collections.UserDict.__init__(self, dict)
+		_UserDict.__init__(self, dict)
 		self.format = str(format)
 	
 	def __repr__(self):
@@ -29,9 +37,9 @@ class FormatDictProxy(collections.UserDict):
 	def __contains__(self, key):
 		return self.format.format(str(key)) in self.data
 
-class SerializeDictProxy(collections.UserDict):
+class SerializeDictProxy(_UserDict):
 	def __init__(self, dict, encoder=None, decoder=None):
-		collections.UserDict.__init__(self, dict)
+		_UserDict.__init__(self, dict)
 		if encoder is None:
 			encoder = json.dumps
 		if decoder is None:

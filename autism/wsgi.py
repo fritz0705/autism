@@ -1,16 +1,29 @@
 # coding: utf-8
 
-import http.cookies
-import collections
+import autism.compat
+
+if not autism.compat.py2k:
+	import http.cookies
+	_SimpleCookie = http.cookies.SimpleCookie
+else:
+	import Cookie
+	_SimpleCookie = Cookie.SimpleCookie
+
+if not autism.compat.py2k:
+	import collections
+	_UserDict = collections.UserDict
+else:
+	import UserDict
+	_UserDict = UserDict.UserDict
 
 __all__ = [
 	"SessionMiddleware",
 	"Session"
 ]
 
-class Session(collections.UserDict):
+class Session(_UserDict):
 	def __init__(self, dict=None, sid=None, persistent=None):
-		collections.UserDict.__init__(self, dict)
+		_UserDict.__init__(self, dict)
 		self.persistent = True if persistent is True else False
 		if sid is None:
 			self.sid = self._generate_sid()
@@ -40,7 +53,7 @@ class SessionMiddleware(object):
 	def __call__(self, environ, start_response):
 		session = None
 
-		reqcookie = http.cookies.SimpleCookie(environ.get("HTTP_COOKIE", ""))
+		reqcookie = _SimpleCookie(environ.get("HTTP_COOKIE", ""))
 		session_id = None
 		if self.session_cookie in reqcookie:
 			session_id = reqcookie[self.session_cookie].value
@@ -55,7 +68,7 @@ class SessionMiddleware(object):
 			session = Session()
 		
 		def _start_response(status, header):
-			cookie = http.cookies.SimpleCookie()
+			cookie = _SimpleCookie()
 			cookie[self.session_cookie] = session.sid
 			header.append(tuple(str(cookie).split(": ", 1)))
 
