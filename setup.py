@@ -5,7 +5,7 @@ import setuptools
 
 setuptools.setup(
 	name="autism",
-	version="0.1",
+	version="0.2a1",
 	packages=[
 		"autism"
 	],

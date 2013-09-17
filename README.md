@@ -8,6 +8,7 @@ other useful modules.
   serialisation or prefixing
 * *autism.tools* Generic tools for parsing user or configuration input
 * *autism.wsgi* Collection of WSGI middlewares
+* *autism.compat* Py3k/Py2k compatibility code
 
 This library was developed as part of a large web application based on Bottle,
 and the web application failed, so this is open source.
