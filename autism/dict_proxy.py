@@ -18,7 +18,7 @@ __all__ = [
 ]
 
 class FormatDictProxy(_UserDict):
-	def __init__(self, dict, format=""):
+	def __init__(self, dict=None, format=""):
 		_UserDict.__init__(self, dict)
 		self.format = str(format)
 	
@@ -38,7 +38,7 @@ class FormatDictProxy(_UserDict):
 		return self.format.format(str(key)) in self.data
 
 class SerializeDictProxy(_UserDict):
-	def __init__(self, dict, encoder=None, decoder=None):
+	def __init__(self, dict=None, encoder=None, decoder=None):
 		_UserDict.__init__(self, dict)
 		if encoder is None:
 			encoder = json.dumps
@@ -57,6 +57,6 @@ class SerializeDictProxy(_UserDict):
 		return key in self.data
 
 class PrefixDictProxy(FormatDictProxy):
-	def __init__(self, backend, prefix=""):
+	def __init__(self, backend=None, prefix=""):
 		FormatDictProxy.__init__(self, backend, str(prefix) + "{}")
 
